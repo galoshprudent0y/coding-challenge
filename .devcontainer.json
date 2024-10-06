@@ -1,0 +1,7 @@
+{
+  "image": "docker:dind",
+  "runArgs": ["--privileged"],
+  "mounts": [
+    "source=dind-var-lib-docker,target=/var/lib/docker,type=volume"
+  ]
+}

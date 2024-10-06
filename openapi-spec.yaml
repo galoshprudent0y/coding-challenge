@@ -1,0 +1,239 @@
+openapi: 3.0.0
+info:
+  title: Clare and Me API
+  description: API for Clare and Me mental health support chatbot
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+security:
+  - bearerAuth: []
+paths:
+  /register:
+    post:
+      summary: Register a new user
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterDto'
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Bad request
+
+  /login:
+    post:
+      summary: Login a user
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDto'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Unauthorized
+
+  /sendMessage:
+    post:
+      summary: Send a message to the chatbot
+      tags:
+        - Message Handling
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageDto'
+      responses:
+        '201':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: string
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+
+  /initiateCheckIn:
+    post:
+      summary: Initiate a check-in flow for a user
+      tags:
+        - Flow Management
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: string
+      responses:
+        '201':
+          description: Check-in initiated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: string
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+
+  /retrieveContext/{userId}:
+    get:
+      summary: Retrieve context for a user
+      tags:
+        - Context Management
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  context:
+                    type: object
+        '401':
+          description: Unauthorized
+
+  /updateContext:
+    post:
+      summary: Update context for a user
+      tags:
+        - Context Management
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContextDto'
+      responses:
+        '201':
+          description: Context updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Bad request
+        '401':
+          description: Unauthorized
+
+  /health:
+    get:
+      summary: Health check endpoint
+      tags:
+        - Health
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    RegisterDto:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    LoginDto:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    SendMessageDto:
+      type: object
+      properties:
+        userId:
+          type: string
+        message:
+          type: string
+      required:
+        - userId
+        - message
+    UpdateContextDto:
+      type: object
+      properties:
+        userId:
+          type: string
+        context:
+          type: object
+      required:
+        - userId
+        - context
